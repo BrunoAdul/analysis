@@ -301,29 +301,6 @@ app.use('/sales', express.static(path.join(__dirname, 'dist')));
 app.get('/sales/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
-      [date, order_number, item_name, selling_price, quantity, buying_price, payment_mode, profit, revenue]
-    );
-    
-    const newItem = {
-      id: result.insertId,
-      date,
-      order_number,
-      item_name,
-      selling_price,
-      quantity,
-      buying_price,
-      payment_mode,
-      profit,
-      revenue
-    };
-    
-    console.log('Added new sales item with ID:', result.insertId);
-    res.status(201).json(newItem);
-  } catch (error) {
-    console.error('Error adding sales item:', error);
-    res.status(500).json({ error: 'Failed to add sales item' });
-  }
-});
 
 // DELETE /api/sales/:id - Delete a sales item
 app.delete('/api/sales/:id', async (req, res) => {
