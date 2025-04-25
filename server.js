@@ -95,7 +95,7 @@ authRouter.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const [users] = await pool.query('SELECT id, email, name, role FROM users WHERE email = ? AND password_hash = ?', [email, password]);
+        const [users] = await pool.query('SELECT id, email, name, role FROM users WHERE email = ? AND password = ?', [email, password]);
         
         if (users.length === 0) {
             return res.status(401).json({ error: 'Invalid email or password' });
@@ -128,7 +128,7 @@ authRouter.post('/register', async (req, res) => {
 
         // Insert the new user into the database with default role 'user'
         const [result] = await pool.query(
-            'INSERT INTO users (email, password_hash, name, role) VALUES (?, ?, ?, ?)',
+            'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
             [email, password, name, 'user']
         );
 
