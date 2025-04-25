@@ -3,23 +3,20 @@ import reactSWC from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  server: {
-    port: 8080,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-        secure: false,
-      }
-    }
-  },
-  plugins: [
-    reactSWC(),
-  ],
-  resolve: {
-    alias: {
-      "@": path.resolve(process.cwd(), "./src"), // Use process.cwd() instead of __dirname
+export default defineConfig(({ command, mode }) => {
+  const isProduction = mode === "production";
+
+  return {
+    base: isProduction ? "/sales/" : "/",
+    server: {
+      port: 8080,
+      host: true,
     },
-  },
+    plugins: [reactSWC()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "src"),
+      },
+    },
+  };
 });
