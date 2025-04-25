@@ -13,7 +13,13 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:8081', 'http://localhost:8080'];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:8081',
+  'http://localhost:8080',
+  'http://13.49.114.18',
+  'http://staging.cerealsplace.com'
+];
 
 app.use(cors({
   origin: function(origin, callback) {
