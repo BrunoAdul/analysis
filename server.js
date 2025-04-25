@@ -18,7 +18,8 @@ const allowedOrigins = [
   'http://localhost:8081',
   'http://localhost:8080',
   'http://13.49.114.18',
-  'http://staging.cerealsplace.com'
+  'http://staging.cerealsplace.com',
+  'https://staging.cerealsplace.com'
 ];
 
 app.use(cors({
