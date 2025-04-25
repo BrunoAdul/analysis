@@ -26,14 +26,11 @@ app.use(cors({
     console.log('CORS origin:', origin);
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    // Temporarily allow all origins for testing
-    callback(null, true);
-    // Uncomment below to restrict origins after testing
-    // if (allowedOrigins.indexOf(origin) !== -1) {
-    //   callback(null, true);
-    // } else {
-    //   callback(new Error('Not allowed by CORS'));
-    // }
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
   credentials: true // Allow credentials
 }));
