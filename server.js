@@ -274,25 +274,7 @@ app.post('/api/sales', async (req, res) => {
 });
 
 // DELETE /api/sales/:id - Delete a sales item
-app.delete('/api/sales/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log('Deleting sales item with ID:', id);
-    
-    const [result] = await pool.query('DELETE FROM sales_items WHERE id = ?', [id]);
-    
-    if (result.affectedRows === 0) {
-      console.log('No item found with ID:', id);
-      return res.status(404).json({ error: 'Sales item not found' });
-    }
-    
-    console.log('Deleted sales item with ID:', id);
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error deleting sales item:', error);
-    res.status(500).json({ error: 'Failed to delete sales item' });
-  }
-});
+// Removed duplicate route definition
 
 app.use('/sales', express.static(path.join(__dirname, 'dist')));
 
@@ -589,6 +571,15 @@ app.delete('/api/users/:id', async (req, res) => {
     console.error('Error deleting user:', error);
     res.status(500).json({ error: 'Failed to delete user' });
   }
+});
+
+  
+// Centralized error-handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error'
+  });
 });
 
 // Start the server
