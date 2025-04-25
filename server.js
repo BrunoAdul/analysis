@@ -298,10 +298,23 @@ app.use('/sales', express.static(path.join(__dirname, 'dist')));
 
 // Serve index.html for all routes under '/sales' to support client-side routing
 app.get('/sales/*', (req, res, next) => {
-  // If the request is for a file (contains a dot), skip to next middleware
-  if (req.path.includes('.')) {
+  // Log the requested path for debugging
+  console.log(`Fallback route hit for: ${req.path}`);
+
+  // List of static file extensions to exclude from fallback
+  const staticFileExtensions = [
+    '.js', '.css', '.map', '.json', '.ico', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ttf', '.eot', '.otf'
+  ];
+
+  // Check if the request path ends with any static file extension
+  const isStaticFile = staticFileExtensions.some(ext => req.path.endsWith(ext));
+
+  if (isStaticFile) {
+    // If it's a static file, skip to next middleware (likely 404)
     return next();
   }
+
+  // Otherwise, send index.html for client-side routing
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
