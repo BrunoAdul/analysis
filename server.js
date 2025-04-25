@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
 
 // Load environment variables
 dotenv.config();
@@ -93,13 +94,22 @@ authRouter.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const [users] = await pool.query('SELECT id, email, name, role FROM users WHERE email = ? AND password = ?', [email, password]);
+        const [users] = await pool.query('SELECT id, email, name, role, password FROM users WHERE email = ?', [email]);
         
         if (users.length === 0) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        res.json(users[0]);
+        const user = users[0];
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        // Remove password before sending response
+        delete user.password;
+
+        res.json(user);
     } catch (error) {
         console.error('Error logging in user:', error);
         res.status(500).json({ error: 'Failed to login' });
