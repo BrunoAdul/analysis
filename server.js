@@ -217,9 +217,13 @@ app.use((req, res, next) => {
 });
 
 // Temporarily disable static files for testing
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.join(__dirname, 'dist')));
-// }
+// Serve static files from the 'dist' directory under the '/sales' base path
+app.use('/sales', express.static(path.join(__dirname, 'dist')));
+
+// Serve index.html for all routes under '/sales' to support client-side routing
+app.get('/sales/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 // GET /api/sales - Get all sales items
 app.get('/api/sales', async (req, res) => {
