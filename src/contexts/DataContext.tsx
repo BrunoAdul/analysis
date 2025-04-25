@@ -3,6 +3,7 @@ import { createContext, useContext, useState, ReactNode, useEffect } from "react
 import { SalesItem, SalesSummary, DateRangeFilter } from "@/types";
 import { toast } from "@/components/ui/sonner";
 import * as XLSX from 'xlsx';
+import { API_ENDPOINTS } from "@/config/api";
 
 interface DataContextType {
   salesData: SalesItem[];
@@ -18,13 +19,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const INITIAL_SALES_DATA: SalesItem[] = [];
 
-// MySQL API endpoints - pointing to the running server
-const API_URL = {
-  GET_SALES: "http://localhost:3001/api/sales",
-  ADD_SALE: "http://localhost:3001/api/sales",
-  DELETE_SALE: "http://localhost:3001/api/sales", // Use ID as a parameter
-  UPLOAD_EXCEL: "http://localhost:3001/api/sales/upload"
-};
+// Using API_ENDPOINTS from config/api.ts
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [salesData, setSalesData] = useState<SalesItem[]>([]);
@@ -36,7 +31,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       try {
         // Fetch data from MySQL via API
-        const response = await fetch(API_URL.GET_SALES);
+        const response = await fetch(API_ENDPOINTS.SALES.GET_ALL);
         
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
@@ -85,7 +80,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await fetch(API_URL.UPLOAD_EXCEL, {
+      const response = await fetch(API_ENDPOINTS.SALES.UPLOAD, {
         method: 'POST',
         body: formData
       });
@@ -144,7 +139,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       };
       
       // Send to MySQL via API
-      const response = await fetch(API_URL.ADD_SALE, {
+      const response = await fetch(API_ENDPOINTS.SALES.ADD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -189,7 +184,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       console.log(`Deleting item with ID: ${id}`);
       
       // Delete from MySQL via API
-      const response = await fetch(`${API_URL.DELETE_SALE}/${id}`, {
+      const response = await fetch(`${API_ENDPOINTS.SALES.DELETE}/${id}`, {
         method: 'DELETE'
       });
       

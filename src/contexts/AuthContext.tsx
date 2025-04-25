@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, UserRole } from "@/types";
+import { API_ENDPOINTS } from "@/config/api";
 
 interface AuthContextType {
   user: User | null;
@@ -30,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
         
         // Verify with the server that this user still exists
-        const response = await fetch('http://localhost:3001/api/auth/verify-session', {
+        const response = await fetch(API_ENDPOINTS.AUTH.VERIFY_SESSION, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${userId}`
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signup = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       // Call logout endpoint (mostly for logging purposes)
-      await fetch('http://localhost:3001/api/auth/logout', {
+      await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
         method: 'POST',
       });
     } catch (error) {
