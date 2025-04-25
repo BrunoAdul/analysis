@@ -294,11 +294,14 @@ app.delete('/api/sales/:id', async (req, res) => {
   }
 });
 
-// Serve static files from the 'dist' directory under the '/sales' base path
 app.use('/sales', express.static(path.join(__dirname, 'dist')));
 
 // Serve index.html for all routes under '/sales' to support client-side routing
-app.get('/sales/*', (req, res) => {
+app.get('/sales/*', (req, res, next) => {
+  // If the request is for a file (contains a dot), skip to next middleware
+  if (req.path.includes('.')) {
+    return next();
+  }
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
