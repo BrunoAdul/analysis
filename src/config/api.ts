@@ -5,7 +5,7 @@ const isDevelopment = window.location.hostname === 'localhost' ||
                       window.location.hostname === '127.0.0.1';
 
 // Base API URL - use localhost in development, relative path in production
-const BASE_API_URL = isDevelopment ? 'http://localhost:3001/api' : '/api';
+const BASE_API_URL = isDevelopment ? 'http://localhost:3001/api' : `${window.location.origin}/api`;
 
 // API endpoints
 export const API_ENDPOINTS = {
