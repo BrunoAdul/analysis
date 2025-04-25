@@ -216,16 +216,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Temporarily disable static files for testing
-// Serve static files from the 'dist' directory under the '/sales' base path
-app.use('/sales', express.static(path.join(__dirname, 'dist')));
-
-// Serve index.html for all routes under '/sales' to support client-side routing
-app.get('/sales/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
-// GET /api/sales - Get all sales items
 app.get('/api/sales', async (req, res) => {
   try {
     console.log('Fetching all sales items');
@@ -259,6 +249,58 @@ app.post('/api/sales', async (req, res) => {
       `INSERT INTO sales_items 
        (date, order_number, item_name, selling_price, quantity, buying_price, payment_mode, profit, revenue) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [date, order_number, item_name, selling_price, quantity, buying_price, payment_mode, profit, revenue]
+    );
+    
+    const newItem = {
+      id: result.insertId,
+      date,
+      order_number,
+      item_name,
+      selling_price,
+      quantity,
+      buying_price,
+      payment_mode,
+      profit,
+      revenue
+    };
+    
+    console.log('Added new sales item with ID:', result.insertId);
+    res.status(201).json(newItem);
+  } catch (error) {
+    console.error('Error adding sales item:', error);
+    res.status(500).json({ error: 'Failed to add sales item' });
+  }
+});
+
+// DELETE /api/sales/:id - Delete a sales item
+app.delete('/api/sales/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('Deleting sales item with ID:', id);
+    
+    const [result] = await pool.query('DELETE FROM sales_items WHERE id = ?', [id]);
+    
+    if (result.affectedRows === 0) {
+      console.log('No item found with ID:', id);
+      return res.status(404).json({ error: 'Sales item not found' });
+    }
+    
+    console.log('Deleted sales item with ID:', id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting sales item:', error);
+    res.status(500).json({ error: 'Failed to delete sales item' });
+  }
+});
+
+// Serve static files from the 'dist' directory under the '/sales' base path
+app.use('/sales', express.static(path.join(__dirname, 'dist')));
+
+// Serve index.html for all routes under '/sales' to support client-side routing
+app.get('/sales/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
       [date, order_number, item_name, selling_price, quantity, buying_price, payment_mode, profit, revenue]
     );
     
