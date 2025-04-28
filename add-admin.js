@@ -6,6 +6,12 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+
+const bcrypt = require('bcrypt');
+const mysql = require('mysql2/promise');
+const dotenv = require('dotenv');
+dotenv.config();
+
 async function addAdminUser() {
   // Database connection configuration
   const dbConfig = {
@@ -27,19 +33,31 @@ async function addAdminUser() {
     const connection = await mysql.createConnection(dbConfig);
     console.log('Connected to MySQL database');
 
-    // Read SQL file
-    const sqlFilePath = path.join(__dirname, 'add-admin-user.sql');
-    const sqlScript = fs.readFileSync(sqlFilePath, 'utf8');
+    // Get admin credentials from environment variables or fallback to defaults
+    const adminName = process.env.ADMIN_NAME || 'Bruno Adul';
+    const adminEmail = process.env.ADMIN_EMAIL || 'brunoadul@gmail.com';
+    const adminPassword = process.env.ADMIN_PASSWORD || '66606@Admin';
 
-    // Execute SQL script
-    console.log('Executing SQL script to add admin user...');
-    const [result] = await connection.query(sqlScript);
+    // Hash the admin password
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+
+    // Insert or update admin user with hashed password
+    const sql = `
+      INSERT INTO users (name, email, password, role)
+      VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        name = VALUES(name),
+        password = VALUES(password),
+        role = VALUES(role);
+    `;
+
+    const [result] = await connection.query(sql, [adminName, adminEmail, hashedPassword, 'admin']);
     
     if (result.affectedRows > 0) {
-      console.log('Admin user added successfully!');
+      console.log('Admin user added or updated successfully!');
       console.log('User details:');
-      console.log('- Name: Bruno Adul');
-      console.log('- Email: brunoadul@gmail.com');
+      console.log('- Name:', adminName);
+      console.log('- Email:', adminEmail);
       console.log('- Role: admin');
     } else {
       console.log('No rows affected. Admin user might already exist.');

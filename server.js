@@ -94,20 +94,20 @@ authRouter.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const [users] = await pool.query('SELECT id, email, name, role, password FROM users WHERE email = ?', [email]);
+        const [users] = await pool.query('SELECT id, email, name, role, password_hash FROM users WHERE email = ?', [email]);
         
         if (users.length === 0) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
         const user = users[0];
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(password, user.password_hash);
         if (!passwordMatch) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        // Remove password before sending response
-        delete user.password;
+        // Remove password_hash before sending response
+        delete user.password_hash;
 
         res.json(user);
     } catch (error) {
@@ -134,10 +134,13 @@ authRouter.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
+        // Hash the password before inserting
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Insert the new user into the database with default role 'user'
         const [result] = await pool.query(
-            'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
-            [email, password, name, 'user']
+            'INSERT INTO users (email, password_hash, name, role) VALUES (?, ?, ?, ?)',
+            [email, hashedPassword, name, 'user']
         );
 
         // Respond with the created user data (excluding password)
